@@ -10,6 +10,7 @@ using Cysharp.Threading.Tasks;
 
 namespace HCIKonstanz.Colibri.Synchronization
 {
+    [ExecuteInEditMode]
     public abstract class SyncBehaviour<T> : MonoBehaviour
         where T : SyncBehaviour<T>
     {
@@ -108,7 +109,7 @@ namespace HCIKonstanz.Colibri.Synchronization
             return action;
         }
 
-        public string Id = Guid.NewGuid().ToString();
+        public string Id;
         private string Channel;
 
         private readonly Dictionary<string, bool> _hasReceivedUpdate = new Dictionary<string, bool>();
@@ -129,8 +130,13 @@ namespace HCIKonstanz.Colibri.Synchronization
 
         protected virtual void Awake()
         {
-            _modelCreateSubject.OnNext(this);
             Channel = typeof(T).Name.ToLower();
+
+            var isPrefab = gameObject.scene == null;
+            if (!isPrefab && String.IsNullOrEmpty(Id))
+                Id = Guid.NewGuid().ToString();
+
+            _modelCreateSubject.OnNext(this);
         }
 
 
