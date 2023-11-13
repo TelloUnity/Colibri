@@ -118,6 +118,13 @@ namespace HCIKonstanz.Colibri.Synchronization
         private bool _isQuitting;
         private bool _hasReceivedDestroyCommand;
         private bool _hasReceivedFirstUpdate;
+        private bool _ignoreDestroy;
+        // Useful for cloning models, since we don't want to "unregister" the original model once the clone is destroyed
+        // TODO: requires clearer naming
+        public void IgnoreDestroy(bool ignoreDestroy)
+        {
+            _ignoreDestroy = ignoreDestroy;
+        }
 
 
         protected virtual void Awake()
@@ -160,6 +167,9 @@ namespace HCIKonstanz.Colibri.Synchronization
 
         protected virtual void OnDestroy()
         {
+            if (_ignoreDestroy)
+                return;
+
             _modelDestroySubject.OnNext(this);
             if (_isQuitting || _hasReceivedDestroyCommand)
                 return;
