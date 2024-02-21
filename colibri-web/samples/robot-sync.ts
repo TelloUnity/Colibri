@@ -1,4 +1,4 @@
-import { Colibri, RegisterModelSync, SyncModel, Synced, ModelSyncRegistration } from '@hcikn/colibri';
+import { Colibri, RegisterModelSync, SyncModel, Synced, ModelSyncRegistration, RegisterModelSyncInstances } from '@hcikn/colibri';
 import { rl, colibriAddress } from './common';
 import { Observable } from 'rxjs';
 
@@ -63,13 +63,13 @@ class SyncManager<T extends SyncModel<T>>  {
 
     public registerNewObject: ((model: T) => void) = (model: T) => {};
 
-    public getObjectInstance: ((id: string) => T | undefined) = (id: string) => { return undefined; };
+    public getInstance: ((id: string) => T | undefined) = (id: string) => { return undefined; };
 
     constructor(modelRegistration: ModelSyncRegistration<T>) {
-        const [ SampleClasses$, registerExampleClass ] = RegisterModelSync<T>(modelRegistration);
+        const [ SampleClasses$, registerExampleClass, getObjectInstance ] = RegisterModelSyncInstances<T>(modelRegistration);
 
         this.registerNewObject = registerExampleClass;
-        //this.getObjectInstance = getClassInstance;
+        this.getInstance = getObjectInstance;
 
         this.sampleClasses$ = SampleClasses$;
         // SampleClasses$ contains all synchronized instances.
