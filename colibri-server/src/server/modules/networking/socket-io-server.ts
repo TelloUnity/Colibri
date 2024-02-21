@@ -101,6 +101,8 @@ export class SocketIOServer extends Service implements NetworkServer {
                 clientName: client.name,
                 clientId: client.id
             });
+        } else {
+            this.logDebug(`New client with default app 'colibri'`);
         }
 
         this.clients.push(client);

@@ -7,15 +7,16 @@ interface ModelSyncMsg<T extends SyncModel<T>> extends Message {
     payload: Partial<T> & { id: string };
 }
 
-interface ModelSyncRegistration<T> {
+export interface ModelSyncRegistration<T> {
     name?: string;
     type: { new(id: string): T };
+    model_id?: string;
 }
 
 type ModelSync<T> = [ Observable<T[]>, (model: T) => void ];
 
 export const RegisterModelSync = <T extends SyncModel<T>>(registration: ModelSyncRegistration<T>): ModelSync<T> => {
-    const name = registration.name || registration.type.name.toLowerCase();
+    const name = registration.name || registration.type.name.toLowerCase() + ('_' + registration.model_id) || '';
 
     // initial data fetch
     SendMessage(name, 'model::request');
@@ -38,12 +39,24 @@ export const RegisterModelSync = <T extends SyncModel<T>>(registration: ModelSyn
 
     const onUpdate = (modelData: Partial<T>) => {
         const model = models.value.find(m => m.id === modelData.id);
+        /*console.log('<----- On update: find');
+        models.value.forEach(c => {
+            console.log(c.id, c.position, c.rotation, c.robot_id);
+        });
+        console.log(model);
+        console.log('On update: find ----->');*/
         if (model) {
             // Update existing model
             model.update(modelData);
             models.next([...models.value]);
         } else if (modelData.id) {
             const newModel = new registration.type(modelData.id);
+            /*console.log('<----- On update: new Model');
+            models.value.forEach(c => {
+                console.log(c.id, c.position, c.rotation, c.robot_id);
+            });
+            console.log(newModel.id, newModel.position, newModel.rotation, newModel.robot_id);
+            console.log('On update: new Model ----->');*/
 
             newModel.modelChanges$.subscribe(changes => {
                 // If we did the changes, we'll ignore it
@@ -54,6 +67,9 @@ export const RegisterModelSync = <T extends SyncModel<T>>(registration: ModelSyn
                 models.next([...models.value]);
             });
 
+            /*console.log('<----- On update: modelData');
+            console.log(modelData);
+            console.log('On update: modelData ----->');*/
             newModel.update(modelData);
             models.next([...models.value, newModel]);
         }
@@ -78,6 +94,7 @@ export const RegisterModelSync = <T extends SyncModel<T>>(registration: ModelSyn
         SendMessage(`${name}`, 'model::update', model.toJson());
         models.next([...models.value, model]);
     };
+
 
     return [ models.asObservable(), registerModel ];
 };

@@ -12,6 +12,7 @@
     "publish": "npm run build && npm publish --access public",
     "samples/broadcast": "tsx samples/broadcast.ts",
     "samples/model-sync": "tsx samples/model-sync.ts",
+    "samples/robot-sync": "tsx samples/robot-sync.ts",
     "samples/remote-logging": "tsx samples/remote-logging.ts"
   },
   "author": "HCI Group, University of Konstanz",
@@ -25,8 +26,10 @@
     "/dist"
   ],
   "dependencies": {
+    "flatbuffers": "^23.5.26",
     "rxjs": "^7.8.1",
     "socket.io-client": "^4.7.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.1.6"
   },
   "devDependencies": {
