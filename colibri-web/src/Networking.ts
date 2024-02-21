@@ -15,9 +15,7 @@ if (typeof window !== 'undefined') {
     location = window.location.hostname || '';
 }
 
-const socket = io.connect({
-    autoConnect: false,
-});
+var socket: io.Socket | null = null;
 
 const init = (app: string, server?: string, port?: number) => {
     server ??= location;
@@ -29,15 +27,19 @@ const init = (app: string, server?: string, port?: number) => {
 
     server += `:${port}`;
 
-    // FIXME: terrible workaround because socket.io marked uri as readonly
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (socket.io as any).uri = server;
-    socket.io.opts.query = { app, version: '1' };
+    socket = io.io(server, {
+        query: { app: app, version: '1' },
+        autoConnect: false,
+    });
+    
     socket.connect();
 
     console.debug(`Connecting to colibri server on ${server}`);
     socket.on('connect', () => {
-        console.debug(`Connected to colibri server on ${server}`);
+        console.log(`Connected to colibri server on ${server}`);
+    });
+    socket.on('error', (error: Error) => {
+        console.log('Socket connection error:', error);
     });
 
     socket.onAny((channel, msg) => {

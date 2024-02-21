@@ -24,7 +24,7 @@ export class SampleClass extends SyncModel<SampleClass> {
 
 
 (async () => {
-    Colibri.init('myAppName', await colibriAddress());
+    Colibri.init('myAppName', "localhost", 9011);
 
     /**
      *  This is the registration for the SampleClass.
