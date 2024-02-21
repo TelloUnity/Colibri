@@ -1,7 +1,6 @@
 import { Colibri, RegisterModelSync, SyncModel, Synced, ModelSyncRegistration } from '@hcikn/colibri';
 import { rl, colibriAddress } from './common';
 import { Observable } from 'rxjs';
-import { forEach } from 'lodash';
 
 
 /**
@@ -10,53 +9,64 @@ import { forEach } from 'lodash';
  */
 export class SyncPath extends SyncModel<SyncPath> {
     @Synced()
-    public position = [0, 0, 0];
+    get position() { return this._position; }
+    set position(val: number[]) { this._position = val; }
+    private _position = [0, 0, 0];
 
     /* Warning: for some reason syncing fields does not work with some frameworks (e.g., React)! */
     @Synced()
-    public rotation = [0, 0, 0, 0];
+    get rotation() { return this._rotation; }
+    set rotation(val: number[]) { this._rotation = val; }
+    private _rotation = [0, 0, 0, 0];
 
     // We can provide a custom name for the synced property
     @Synced()
-    public owner = '';
+    get owner() { return this._owner; }
+    set owner(val: string) { this._owner = val; }
+    private _owner = '';
 
     @Synced()
-    public path = [];
+    get path() { return this._path; }
+    set path(val: number[][]) { this._path = val; }
+    private _path = [] as number[][];
+
+    toObj() {
+        return { id: this.id, position: this.position, rotation: this.rotation, owner: this.owner, path: this.path };
+    }
+    
 }
 
 export class SyncRobot extends SyncModel<SyncRobot> {
     @Synced()
-    public position = [0, 0, 0];
+    get position() { return this._position; }
+    set position(val: number[]) { this._position = val; }
+    private _position = [0, 0, 0];
 
-    /* Warning: for some reason syncing fields does not work with some frameworks (e.g., React)! */
     @Synced()
-    public rotation = [0, 0, 0, 0];
+    get rotation() { return this._rotation; }
+    set rotation(val: number[]) { this._rotation = val; }
+    private _rotation = [0, 0, 0, 0];
 
-    // We can provide a custom name for the synced property
     @Synced()
-    public robot_id = '';
+    get robot_id() { return this._robot_id; }
+    set robot_id(val: string) { this._robot_id = val; }
+    private _robot_id = '';
+
+    toObj() {
+        return { id: this.id, position: this.position, rotation: this.rotation, robot_id: this.robot_id };
+    }
 }
 
-class SyncManagerRobot {
+class SyncManager<T extends SyncModel<T>>  {
 
-    public sampleClasses$: Observable<SyncRobot[]> | undefined;
+    public sampleClasses$: Observable<T[]> | undefined;
 
-    public registerNewObject: ((model: SyncRobot) => void) = (model: SyncRobot) => {};
+    public registerNewObject: ((model: T) => void) = (model: T) => {};
 
-    public getObjectInstance: ((id: string) => SyncRobot | undefined) = (id: string) => { return undefined; };
+    public getObjectInstance: ((id: string) => T | undefined) = (id: string) => { return undefined; };
 
-    private model_id: string = '';
-
-    constructor(model_id: string) {
-        this.model_id = model_id;
-    }
-
-    registerManager() {
-        /**
-         *  This is the registration for the SampleClass.
-         *  It returns an observable (BehaviorSubject) that contains all instances of SampleClass and a function to register new instances.
-         */
-        const [ SampleClasses$, registerExampleClass ] = RegisterModelSync<SyncRobot>({ type: SyncRobot, model_id: this.model_id });
+    constructor(modelRegistration: ModelSyncRegistration<T>) {
+        const [ SampleClasses$, registerExampleClass ] = RegisterModelSync<T>(modelRegistration);
 
         this.registerNewObject = registerExampleClass;
         //this.getObjectInstance = getClassInstance;
@@ -67,11 +77,7 @@ class SyncManagerRobot {
         this.sampleClasses$.subscribe(classes => {
             // will be called whenever a new instance is created, an existing one is updated, or one is deleted
             // please refer to RxJS documentation for more information: https://rxjs.dev/guide/overview
-            console.log('<----- log changes');
-            classes.forEach(c => {
-                console.log(c.id, c.position, c.rotation, c.robot_id);
-            });
-            console.log('log changes ----->');
+            console.log(`Current ${modelRegistration.type.name}:`, classes.map(c => (c.toObj())));
         });
     }
 
@@ -86,13 +92,10 @@ class SyncManagerRobot {
      *  This is the registration for the SampleClass.
      *  It returns an observable (BehaviorSubject) that contains all instances of SampleClass and a function to register new instances.
      */
-    //var managerPath = new SyncManager<SyncPath>({ type: SyncPath, model_id: 'paths_vr' });
+    var managerPath = new SyncManager<SyncPath>({ type: SyncPath, model_id: 'paths_vr' });
     //managerPath.registerManager();
 
-    var managerRobots = new SyncManagerRobot('robot_vr');
-    managerRobots.registerManager();
-
-
+    var managerRobots = new SyncManager<SyncRobot>({ type: SyncRobot, model_id: 'robot_vr' });
 
     // When creating a new instance, we need to register it with the model synchronization
     //const newClass = new SyncRobot('test2');

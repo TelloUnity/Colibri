@@ -54,6 +54,7 @@ const init = (app: string, server?: string, port?: number) => {
         //         }
         //     });
         // }
+        //console.log('(Any) Received message:', channel, msg);
         messageSubject.next({
             channel,
             command: msg.command,

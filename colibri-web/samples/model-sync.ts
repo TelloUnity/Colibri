@@ -12,13 +12,15 @@ export class SampleClass extends SyncModel<SampleClass> {
     set name(val: string) { this._name = val; }
     private _name = '';
 
-    /* Warning: for some reason syncing fields does not work with some frameworks (e.g., React)! */
     @Synced()
-    public age = 0;
+    get age() { return this._age; }
+    set age(val: number) { this._age = val; }
+    private _age = 0;
 
-    // We can provide a custom name for the synced property
-    @Synced('billingAddress')
-    public address = '';
+    @Synced()
+    get address() { return this._address; }
+    set address(val: string) { this._address = val; }
+    private _address = '';
 }
 
 

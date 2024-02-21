@@ -74,4 +74,8 @@ export abstract class SyncModel<T> {
 
         return json;
     }
+
+    toObj() {
+        return { id: this.id };
+    }
 }

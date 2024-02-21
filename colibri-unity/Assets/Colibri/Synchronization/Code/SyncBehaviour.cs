@@ -227,7 +227,6 @@ namespace HCIKonstanz.Colibri.Synchronization
                 return;
             }
 
-
             if (_nextUpdate == null)
                 _nextUpdate = new JObject { { "id", Id } };
 
@@ -298,7 +297,7 @@ namespace HCIKonstanz.Colibri.Synchronization
                 Debug.LogError($"Unable to update attribute {name}: Unsupported type {attribute.PropertyType}");
 
             var newValue = attribute.Getter(this as T);
-            if (newValue != null)
+            if (newValue != null) 
                 _hasReceivedUpdate[name] = !newValue.Equals(oldValue);
             else
                 _hasReceivedUpdate[name] = newValue != oldValue;
