@@ -162,4 +162,4 @@ export const RegisterModelSyncInstances = <T extends SyncModel<T>>(registration:
 
 
     return [ models.asObservable(), registerModel, getInstance ];
-
+}

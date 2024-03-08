@@ -13,6 +13,7 @@
     "samples/broadcast": "tsx samples/broadcast.ts",
     "samples/model-sync": "tsx samples/model-sync.ts",
     "samples/robot-sync": "tsx samples/robot-sync.ts",
+    "samples/ros-robot-sync": "tsx samples/ros-robot-sync.ts",
     "samples/remote-logging": "tsx samples/remote-logging.ts"
   },
   "author": "HCI Group, University of Konstanz",

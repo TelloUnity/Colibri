@@ -1,6 +1,7 @@
 import { Colibri, RegisterModelSync, SyncModel, Synced, ModelSyncRegistration, RegisterModelSyncInstances } from '@hcikn/colibri';
 import { rl, colibriAddress } from './common';
 import { Observable } from 'rxjs';
+import { set } from 'lodash';
 
 
 /**
@@ -55,15 +56,32 @@ export class SyncRobot extends SyncModel<SyncRobot> {
     toObj() {
         return { id: this.id, position: this.position, rotation: this.rotation, robot_id: this.robot_id };
     }
+
+    moveRobotTo(x: number, y: number, z: number, steps: number, delay: number) {
+        // updated the position incrementally until it reaches the target
+        const dx = (x - this.position[0]) / steps;
+        const dy = (y - this.position[1]) / steps;
+        const dz = (z - this.position[2]) / steps;
+        for (let i = 0; i < steps; i++) {
+            setTimeout(() => {
+                this.position = [this.position[0] + dx, this.position[1] + dy, this.position[2] + dz];
+            }, delay*i);
+        }
+
+    }
 }
 
-class SyncManager<T extends SyncModel<T>>  {
+export class SyncManager<T extends SyncModel<T>>  {
 
     public sampleClasses$: Observable<T[]> | undefined;
 
     public registerNewObject: ((model: T) => void) = (model: T) => {};
 
+    public newObjectUpdate: ((new_ids: string[]) => void) = (new_ids: string[]) => {};
+
     public getInstance: ((id: string) => T | undefined) = (id: string) => { return undefined; };
+
+    private names: string[] = [];
 
     constructor(modelRegistration: ModelSyncRegistration<T>) {
         const [ SampleClasses$, registerExampleClass, getObjectInstance ] = RegisterModelSyncInstances<T>(modelRegistration);
@@ -77,7 +95,15 @@ class SyncManager<T extends SyncModel<T>>  {
         this.sampleClasses$.subscribe(classes => {
             // will be called whenever a new instance is created, an existing one is updated, or one is deleted
             // please refer to RxJS documentation for more information: https://rxjs.dev/guide/overview
-            console.log(`Current ${modelRegistration.type.name}:`, classes.map(c => (c.toObj())));
+            //console.log(`Current ${modelRegistration.type.name}:`, classes.map(c => (c.toObj())));
+            var new_ids = [];
+            for (const c of classes) {
+                if (!this.names.includes(c.id)) {
+                    this.names.push(c.id);
+                    new_ids.push(c.id);
+                }
+            }
+            this.newObjectUpdate(new_ids);
         });
     }
 
