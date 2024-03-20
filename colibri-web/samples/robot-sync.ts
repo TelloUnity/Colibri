@@ -53,6 +53,11 @@ export class SyncRobot extends SyncModel<SyncRobot> {
     set robot_id(val: string) { this._robot_id = val; }
     private _robot_id = '';
 
+    @Synced()
+    get move() { return this._move; }
+    set move(val: boolean) { this._move = val; }
+    private _move = false;
+
     toObj() {
         return { id: this.id, position: this.position, rotation: this.rotation, robot_id: this.robot_id };
     }
