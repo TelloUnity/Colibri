@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
 guid: a59e9ae4b8d544c15bacd3c26df69b79
+=======
+guid: dfecaea94f07c8d4b8d1596fbaf4cf7c
+>>>>>>> main
 ShaderImporter:
   defaultTextures: []
   userData: 

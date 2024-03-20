@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
 guid: 539eaba11a1b749729d1aa2fe58eda66
+=======
+guid: ac785100d1f6d304ab2b6a909ccc70fe
+>>>>>>> main
 timeCreated: 1450517184
 licenseType: Pro
 ShaderImporter:
